@@ -11,7 +11,7 @@ https://github.com/googlesamples/android-ndk/blob/86ceeb248bb20bfffb09330d1a95bc
 */
 
 #include <string.h>
-#include <jni.h>
+#include "jni.h"
 
 JNIEXPORT jstring JNICALL
 Java_com_akavel_hello2_HelloActivity_stringFromJNI( JNIEnv* env, jobject thiz )
