@@ -22,10 +22,12 @@ Build Steps
        $ git clone https://github.com/akavel/hellomello
          # Edit `nim.cfg`: change `--clang.path=...` to a correct path to clang in your Android NDK directory.
          # Also: remove `.cmd` suffixes in `nim.cfg` if you are on Linux.
+       $ cd hellomello
        $ nim c --app:lib --os:android --cpu=arm -d:noSignalHandler --hint[CC]:on hello.nim
        $ mkdir lib
        $ mkdir lib/armeabi-v7a
        $ mv libhello.so lib/armeabi-v7a/libhello-mello.so
+       $ cd ..
 
 2. Assemble the Dalvik bytecode (required to wrap the JNI library), using dali:
 
@@ -46,6 +48,12 @@ Build Steps
 4. Build an unsigned .apk, using OS-provided zip archiver:
 
        $ zip -r unsigned.apk  classes.dex lib/ AndroidManifest.xml
+         adding: classes.dex (172 bytes security) (deflated 44%)
+         adding: lib/ (192 bytes security) (stored 0%)
+         adding: lib/armeabi-v7a/ (192 bytes security) (stored 0%)
+         adding: lib/armeabi-v7a/libhello-mello.so (172 bytes security) (deflated 60%)
+         adding: AndroidManifest.xml (172 bytes security) (stored 0%)
+       $ cd ..
 
 5. Sign the .apk, using apksigner tool written in Go:
 
@@ -54,6 +62,18 @@ Build Steps
        $ go build
        $ cd ../hellomello
        $ ../apksigner/apksigner -i unsigned.apk -o hello.apk -k key.pk8 -c key.x509.pem
+       $ unzip -l hello.apk
+       Archive:  hello.apk
+         Length     Date   Time    Name
+        --------    ----   ----    ----
+             282  00-00-80 00:00   META-INF/MANIFEST.MF
+             335  00-00-80 00:00   META-INF/CERT.SF
+             436  00-00-80 00:00   META-INF/CERT.EC
+              14  06-05-19 22:30   AndroidManifest.xml
+            1060  06-05-19 22:29   classes.dex
+          149348  06-05-19 22:28   lib/armeabi-v7a/libhello-mello.so
+        --------                   -------
+          151475                   6 files
 
 6. ...aaand you should have a `hello.apk` file now, **ready to be installed**
    on an ARM-based Android device. Worked For Me&trade;... In case of problems
