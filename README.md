@@ -10,7 +10,7 @@ To build the project, you will currently need the following prerequisites:
     - *standalone* toolchain — just
       [download][ndk] and unpack
       somewhere, no installation required afterwards (still, ~2.5GB unpacked)
- - ...and: NO Java, NO JRE, NO Android Studio, NO Android SDK!
+ - ...and: NO Java, NO JRE, NO Android Studio, NO Android SDK! 🎉
 
 [ndk]: https://developer.android.com/ndk/downloads
 
