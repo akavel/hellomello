@@ -25,7 +25,7 @@ Build Steps
        $ mkdir lib/armeabi-v7a
        $ mv libhello.so lib/armeabi-v7a/libhello-mello.so
 
-2. Assemble the wrapper/stub bytecode, using dali:
+2. Assemble the Dalvik bytecode (required to wrap the JNI library), using dali:
 
        $ git clone https://github.com/akavel/dali
        $ cd dali
