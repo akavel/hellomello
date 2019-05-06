@@ -6,11 +6,13 @@ To build the project, you will currently need the following prerequisites:
  - [Nim compiler](https://nim-lang.org/install.html)
  - [Go compiler](https://golang.org/dl/) (TODO: remove this dependency —
    at least provide prebuilt binaries of *apksigner*)
- - Android NDK (the elephant in the room...)
+ - [Android NDK][ndk] (the elephant in the room...)
     - *standalone* toolchain — just
-      [download](https://developer.android.com/ndk/downloads) and unpack
+      [download][ndk] and unpack
       somewhere, no installation required afterwards (still, ~2.5GB unpacked)
  - ...and: NO Java, NO JRE, NO Android Studio, NO Android SDK!
+
+[ndk]: https://developer.android.com/ndk/downloads
 
 Build Steps
 -----------
