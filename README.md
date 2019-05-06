@@ -1,6 +1,9 @@
 HelloWorld.apk built with Nim and no Android Studio
 ===================================================
 
+
+<img src="https://raw.githubusercontent.com/akavel/hellomello/master/exp/screenshot.png" width="360" height="640"/>
+
 To build the project, you will currently need the following prerequisites:
 
  - [Nim compiler](https://nim-lang.org/install.html)
