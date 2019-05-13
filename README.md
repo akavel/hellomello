@@ -32,7 +32,7 @@ Build Steps
        $ mv libhello.so lib/armeabi-v7a/libhello-mello.so
        $ cd ..
 
-2. Assemble the Dalvik bytecode (required to wrap the JNI library), using dali:
+2. Assemble the Dalvik bytecode (required to wrap the JNI library), using [dali](https://github.com/akavel/dali):
 
        $ git clone https://github.com/akavel/dali
        $ cd dali
@@ -40,7 +40,7 @@ Build Steps
        $ ./jni_hello > ../hellomello/classes.dex
        $ cd ..
 
-3. Compile the manifest file to binary format, using marco:
+3. Compile the manifest file to binary format, using [marco](https://github.com/akavel/marco):
 
        $ git clone https://github.com/akavel/marco
        $ cd marco
@@ -58,7 +58,7 @@ Build Steps
          adding: AndroidManifest.xml (172 bytes security) (stored 0%)
        $ cd ..
 
-5. Sign the .apk, using apksigner tool written in Go:
+5. Sign the .apk, using [apksigner](https://github.com/akavel/apksigner) tool written in Go:
 
        $ git clone https://github.com/akavel/apksigner
        $ cd apksigner
