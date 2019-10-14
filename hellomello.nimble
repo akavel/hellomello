@@ -25,7 +25,7 @@ task so, "Compile and link an Android .so library":
   # http://akehrer.github.io/posts/connecting-nim-to-python/
   # https://forum.nim-lang.org/t/3575
   # https://forum.nim-lang.org/t/2696#16699
-  exec("nim c --app:lib --os:android --cpu=arm -d:noSignalHandler --hint[CC]:on --listcmd -o:apk/armeabi-v7a/libhello-mello.so hello.nim")
+  exec("nim c --app:lib --os:android --cpu=arm -d:noSignalHandler --hint[CC]:on --listcmd -o:apk/lib/armeabi-v7a/libhello-mello.so hello.nim")
 
 from os import getHomeDir
 
