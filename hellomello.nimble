@@ -41,3 +41,6 @@ task manifest, "Compile AndroidManifest.xml to binary format":
   # TODO: when failed, print instructions how to install and build https://github.com/akavel/marco
   exec(marco & " -i=AndroidManifest.xml -o=apk/AndroidManifest.xml")
 
+task apk, "Build a signed .apk archive containing files from apk/ directory":
+  exec("basia -i=apk/ -o=hello.apk -c=cert.x509.pem -k=key.pk8")
+
