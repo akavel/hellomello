@@ -23,11 +23,11 @@ const
 
 classes_dex "apk/classes.dex":
   dclass com.akavel.hello2.HelloActivity {.public, nimSelf.} of Activity:
-    # proc `<clinit>`() {.static, constructor, regs:2, ins:0, outs:1.} =
-    #   # System.loadLibrary("hello-mello")
-    #   const_string(0, "hello-mello")
-    #   invoke_static(0, jproto System.loadLibrary(String))
-    #   return_void()
+    proc `<clinit>`() {.static, constructor, regs:2, ins:0, outs:1.} =
+      # System.loadLibrary("hello-mello")
+      const_string(0, "hello-mello")
+      invoke_static(0, jproto System.loadLibrary(String))
+      return_void()
     proc `<init>`() {.public, constructor, regs:1, ins:1, outs:1.} =
       invoke_direct(0, jproto Activity.`<init>`())
       return_void()
@@ -52,20 +52,34 @@ classes_dex "apk/classes.dex":
       # return
       return_void()
 
-    # proc stringFromJNI(): jstring {.public, native.} =
-    #   return jenv.NewStringUTF(jenv, "Hello from Nim dclass :D")
-
     proc stringFromField(): jstring {.regs:4, ins:1, outs:3.} =
-      # this.nimSelf = (long)42
-      const_wide_16(0, 42'i16)
+      # this.nimSelf = (long)43
+      const_wide_16(0, 43'i16)
       iput_wide(0, 3,
         Field(class:HelloActivity, typ:"J", name:"nimSelf"))
-      # v1..2 = this.nimSelf
-      iget_wide(1, 3,
-        Field(class:HelloActivity, typ:"J", name:"nimSelf"))
-      # v0 = Long.toString(v1..2)
-      invoke_static(1, 2, jproto Long.toString(jlong) -> jstring)
+
+      # # v1..2 = this.nimSelf
+      # iget_wide(1, 3,
+      #   Field(class:HelloActivity, typ:"J", name:"nimSelf"))
+      # # v0 = Long.toString(v1..2)
+      # invoke_static(1, 2, jproto Long.toString(jlong) -> jstring)
+      # move_result_object(0)
+
+      # v0 = this.stringFromJNI()
+      #  NOTE: failure to call a Native function should result in
+      #  java.lang.UnsatisfiedLinkError exception
+      invoke_virtual(3, jproto HelloActivity.stringFromJNI() -> jstring)
       move_result_object(0)
       # return v0
       return_object(0)
+
+    proc stringFromJNI(): jstring {.public, native.} =
+      let helloClass = jenv.FindClass(jenv, "com/akavel/hello2/HelloActivity")
+      let nimSelfField = jenv.GetFieldId(jenv, helloClass, "nimSelf", "J")
+      let longVal = jenv.GetLongField(jenv, jthis, nimSelfField)
+      let longClass = jenv.FindClass(jenv, "java/lang/Long")
+      let toStringMethod = jenv.GetStaticMethodID(jenv, longClass, "toString", "(J)Ljava/lang/String;")
+      let stringVal = jenv.CallStaticObjectMethod(jenv, longClass, toStringMethod, longVal)
+      return cast[jstring](stringVal)
+      # return jenv.NewStringUTF(jenv, "Hello from Nim dclass :D")
 
