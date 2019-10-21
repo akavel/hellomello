@@ -27,18 +27,17 @@ when not defined android:
 
   let d = newDex()
   d.classes.add ClassDef(
-    class: Jnim, access: {Public}, superclass: NoType,
+    class: Jnim, access: {Public}, superclass: NoType(),
     class_data: ClassData(
       direct_methods: @[
-        EncodedMethod(m: jproto Jnim._0(jlong), access: {Public, Static, Native}, code: NoCode)])),
+        EncodedMethod(m: jproto Jnim.`_ 0`(jlong), access: {Public, Static, Native}, code: NoCode())]))
   d.classes.add ClassDef(
-    class: NimObject, access: {Public, Interface}, superclass: NoType)
+    class: NimObject, access: {Public, Interface}, superclass: NoType())
   d.classes.add ClassDef(
-    class: HelloActivity, access: {Public, Static}, superclass: SomeClass(Activity), interfaces: @[NimObject],
+    class: HelloActivity, access: {Public, Static}, superclass: SomeType(Activity), interfaces: @[NimObject],
     class_data: ClassData(
       instance_fields: @[
-        EncodedField(access: {Private}, f: Field(
-          class: HelloActivity, typ: "J", "_1")),
+        EncodedField(access: {Private}, f: HelloActivity_self),
         ],
       direct_methods: @[
         EncodedMethod(m: jproto HelloActivity.`<clinit>`(), access: {Static, Constructor}, code: SomeCode(Code(
@@ -52,12 +51,11 @@ when not defined android:
           registers: 3, ins: 3, outs: 0, instrs: @[
             # ins: this, arg0/1
             # this.nimSelf = arg01
-            iput_wide(1, 0,
-              Field(class:HelloActivity, typ:"J", name:"nimSelf")),
+            iput_wide(1, 0, HelloActivity_self),
             return_void(),
           ]))),
         EncodedMethod(m: jproto HelloActivity.`<init>`(), access: {Public, Constructor}, code: SomeCode(Code(
-          registers: 1, ins: 1, outs: 1, code: @[
+          registers: 1, ins: 1, outs: 1, instrs: @[
             invoke_direct(0, jproto Activity.`<init>`()),
             return_void(),
           ]))),
@@ -76,12 +74,11 @@ when not defined android:
               # super.finalize()
               invoke_super(2, jproto Activity.finalize()),
               # this._0(nimSelf)
-              iget_wide(2, 0,
-                Field(class:HelloActivity, typ:"J", name:"nimSelf")),
-              invoke_static(0, jproto Jnim._0(jlong)),
+              iget_wide(2, 0, HelloActivity_self),
+              invoke_static(0, jproto Jnim.`_ 0`(jlong)),
               # this.nimSelf = 0
               const_wide_16(0, 0'i16),
-              iput_wide(2, 0),
+              iput_wide(2, 0, HelloActivity_self),
               return_void(),
           ]))),
         EncodedMethod(m: jproto HelloActivity.onCreate(Bundle), access: {Public}, code: SomeCode(Code(
@@ -117,8 +114,8 @@ when not defined android:
             # return v0
             return_object(0),
           ]))),
-        EncodedMethod(m: jproto HelloActivity.stringFromJNI() -> jstring, access: {Public, Native}, code: NoCode),
-      ))
+        EncodedMethod(m: jproto HelloActivity.stringFromJNI() -> jstring, access: {Public, Native}, code: NoCode()),
+      ]))
   stdout.write(d.render)
 
 
