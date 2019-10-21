@@ -22,6 +22,7 @@ when not defined android:
     Jnim = "Lcom/akavel/hello2/Jnim;"
     HelloActivity = "Lcom/akavel/hello2/Jnim$HelloActivity;"
     Throws = "Ldalvik/annotation/Throws;"
+    Throwable = "Ljava/lang/Throwable;"
   let
     HelloActivity_self = Field(class:HelloActivity, typ:"J", name:"_1")
 
@@ -63,9 +64,9 @@ when not defined android:
       virtual_methods: @[
         EncodedMethod(m: jproto HelloActivity.finalize(), access: {Protected},
           annotations: @[
-            Annotation(VisSystem, EncodedAnnotation(typ: Throws, elems: @[
-              AnnotationElement(name: "value", value: EVArray(arrayElems: @[
-                EVType(typ: Throwable),
+            (VisSystem, EncodedAnnotation(typ: Throws, elems: @[
+              AnnotationElement(name: "value", value: EVArray(@[
+                EVType(Throwable),
               ]))
             ]))],
           code: SomeCode(Code(
