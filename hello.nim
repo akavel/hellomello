@@ -60,6 +60,19 @@ when not defined android:
             invoke_direct(0, jproto Activity.`<init>`()),
             return_void(),
           ]))),
+        EncodedMethod(m: jproto HelloActivity.stringFromField() -> jstring, access: {Private}, code: SomeCode(Code(
+          registers: 4, ins: 1, outs: 3, instrs: @[
+            # this.nimSelf = (long)43
+            const_wide_16(0, 43'i16),
+            iput_wide(0, 3, HelloActivity_self),
+            # v0 = this.stringFromJNI()
+            #  NOTE: failure to call a Native function should result in
+            #  java.lang.UnsatisfiedLinkError exception
+            invoke_virtual(3, jproto HelloActivity.stringFromJNI() -> jstring),
+            move_result_object(0),
+            # return v0
+            return_object(0),
+          ]))),
         ],
       virtual_methods: @[
         EncodedMethod(m: jproto HelloActivity.finalize(), access: {Protected},
@@ -93,7 +106,7 @@ when not defined android:
             # v1 = this.stringFromField()
             #  NOTE: failure to call a Native function should result in
             #  java.lang.UnsatisfiedLinkError exception
-            invoke_virtual(2, jproto HelloActivity.stringFromField() -> String),
+            invoke_direct(2, jproto HelloActivity.stringFromField() -> String),
             move_result_object(1),
             # v0.setText(v1)
             invoke_virtual(0, 1, jproto TextView.setText(CharSequence)),
@@ -101,19 +114,6 @@ when not defined android:
             invoke_virtual(2, 0, jproto HelloActivity.setContentView(View)),
             # return
             return_void(),
-          ]))),
-        EncodedMethod(m: jproto HelloActivity.stringFromField() -> jstring, access: {Private}, code: SomeCode(Code(
-          registers: 4, ins: 1, outs: 3, instrs: @[
-            # this.nimSelf = (long)43
-            const_wide_16(0, 43'i16),
-            iput_wide(0, 3, HelloActivity_self),
-            # v0 = this.stringFromJNI()
-            #  NOTE: failure to call a Native function should result in
-            #  java.lang.UnsatisfiedLinkError exception
-            invoke_virtual(3, jproto HelloActivity.stringFromJNI() -> jstring),
-            move_result_object(0),
-            # return v0
-            return_object(0),
           ]))),
         EncodedMethod(m: jproto HelloActivity.stringFromJNI() -> jstring, access: {Public, Native}, code: NoCode()),
       ]))
