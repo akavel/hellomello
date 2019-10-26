@@ -49,13 +49,6 @@ when not defined android:
             invoke_static(0, jproto System.loadLibrary(String)),
             return_void(),
           ]))),
-        EncodedMethod(m: jproto HelloActivity.`<init>`(jlong), access: {Protected, Constructor}, code: SomeCode(Code(
-          registers: 3, ins: 3, outs: 0, instrs: @[
-            # ins: this, arg0/1
-            # this.nimSelf = arg01
-            iput_wide(1, 0, HelloActivity_self),
-            return_void(),
-          ]))),
         EncodedMethod(m: jproto HelloActivity.`<init>`(), access: {Public, Constructor}, code: SomeCode(Code(
           registers: 1, ins: 1, outs: 1, instrs: @[
             invoke_direct(0, jproto Activity.`<init>`()),
@@ -117,6 +110,13 @@ when not defined android:
             return_void(),
           ]))),
         EncodedMethod(m: jproto HelloActivity.stringFromJNI() -> jstring, access: {Public, Native}, code: NoCode()),
+        EncodedMethod(m: jproto HelloActivity.`_ 2`(jlong), access: {Protected}, code: SomeCode(Code(
+          registers: 3, ins: 3, outs: 0, instrs: @[
+            # ins: this, arg0/1
+            # this.nimSelf = arg01
+            iput_wide(1, 0, HelloActivity_self),
+            return_void(),
+          ]))),
       ]))
   writeFile("apk/classes.dex", d.render)
 
