@@ -23,17 +23,18 @@ when not defined android:
     HelloActivity = "Lcom/akavel/hello2/Jnim$HelloActivity;"
     Throws = "Ldalvik/annotation/Throws;"
     Throwable = "Ljava/lang/Throwable;"
+    Object = "Ljava/lang/Object;"
   let
     HelloActivity_self = Field(class:HelloActivity, typ:"J", name:"_1")
 
   let d = newDex()
   d.classes.add ClassDef(
-    class: Jnim, access: {Public}, superclass: NoType(),
+    class: Jnim, access: {Public}, superclass: SomeType(Object),
     class_data: ClassData(
       direct_methods: @[
         EncodedMethod(m: jproto Jnim.`_ 0`(jlong), access: {Public, Static, Native}, code: NoCode())]))
   d.classes.add ClassDef(
-    class: NimObject, access: {Public, Interface}, superclass: NoType())
+    class: NimObject, access: {Public, Interface}, superclass: SomeType(Object))
   d.classes.add ClassDef(
     class: HelloActivity, access: {Public, Static}, superclass: SomeType(Activity), interfaces: @[NimObject],
     class_data: ClassData(
