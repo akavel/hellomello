@@ -34,7 +34,7 @@ task manifest, "Compile AndroidManifest.xml to binary format":
   # Based on: https://github.com/nim-lang/nimble/tree/v0.11.0#nimbles-folder-structure-and-packages
   # and contents found in actual files in ~/.nimble/bin/
   #let bin = getHomeDir() & ".nimble/bin"
-  const hash = "779604bcd42589120266b35aa5baf93aa44a016d"
+  const hash = "efadb3f340327c36712115acb881cafa1774a47b"
   let marco = getHomeDir() & ".nimble/pkgs/marco-#" & hash & "/marco".toExe
   if not existsFile(marco):
     exec("nimble install https://github.com/akavel/marco@#" & hash)
