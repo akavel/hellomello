@@ -82,11 +82,11 @@ when not defined android:
               # super.finalize()
               invoke_super(2, jproto Activity.finalize()),
               # this._0(nimSelf)
-              iget_wide(2, 0, HelloActivity_self),
-              invoke_static(0, jproto Jnim.`_ 0`(jlong)),
+              iget_wide(0, 2, HelloActivity_self),
+              invoke_static(0, 1, jproto Jnim.`_ 0`(jlong)),
               # this.nimSelf = 0
               const_wide_16(0, 0'i16),
-              iput_wide(2, 0, HelloActivity_self),
+              iput_wide(0, 2, HelloActivity_self),
               return_void(),
           ]))),
         EncodedMethod(m: jproto HelloActivity.onCreate(Bundle), access: {Public}, code: SomeCode(Code(
