@@ -9,7 +9,7 @@ srcDir        = "src"
 
 # Dependencies
 
-requires "nim >= 1.0.0"
+requires "nim >= 1.0.2"
 requires "dali#85fad59"
 requires "jnim 0.5.1"
 

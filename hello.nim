@@ -117,11 +117,15 @@ when not defined android:
           ]))),
         EncodedMethod(m: jproto HelloActivity.stringFromJNI() -> jstring, access: {Public, Native}, code: NoCode()),
       ]))
-  stdout.write(d.render)
+  writeFile("apk/classes.dex", d.render)
 
 
 when defined android:
   import jnim
+
+  proc Java_com_akavel_hello2_Jnim_00024HelloActivity_0*(jniEnv: JNIEnvPtr, this: jobject, p: jlong) {.exportc: "Java_com_akavel_hello2_Jnim_00024HelloActivity__0", cdecl.} =
+    discard
+    # finalizeJobject(jniEnv, this, p)
 
   proc Java_com_akavel_hello2_Jnim_00024HelloActivity_stringFromJNI*(jenv: JNIEnvPtr;
       jthis: jobject): jstring {.cdecl, exportc, dynlib.} =
