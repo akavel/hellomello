@@ -11,14 +11,15 @@ srcDir        = "src"
 
 requires "nim >= 1.0.2"
 requires "dali 0.3.0"
-requires "jnim 0.5.1"
+requires "jnim#dali"
 
 
 # Tasks
 
 task dex, "Assemble a classes.dex file":
   mkDir("apk")
-  exec("nim c -r hello.nim")
+  exec("nim c -d:jnimGenDex hello.nim")
+  exec("nim c -r _gen_dex.nim")
 
 task so, "Compile and link an Android .so library":
   mkDir("apk")
