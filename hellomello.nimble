@@ -11,7 +11,7 @@ srcDir        = "src"
 
 requires "nim >= 1.0.2"
 requires "dali 0.3.0"
-requires "jnim#dali"
+requires "https://github.com/akavel/jnim#dali"
 
 
 # Tasks
