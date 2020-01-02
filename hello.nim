@@ -1,27 +1,23 @@
 {.experimental: "codeReordering".}
 import jnim
 
-jclassDef android.view.View of JVMObject
-jclassDef android.os.Bundle of JVMObject
+import android/content/context
+import android/app/activity
+import android/os/bundle
+import android/view/view
 
-jclass android.app.Activity of JVMObject:
-  proc new()
-  proc onCreate(b: Bundle)
-  proc setContentView(v: View)
-
-jclassDef android.content.Context of JVMObject
 jclassDef java.lang.CharSequence of JVMObject
 
-jclass android.widget.TextView of JVMObject:
+jclass android.widget.TextView of View:
   proc new(c: Context)
   proc setText(s: CharSequence)
 
 
 type
-  NimActivity = ref object of JVMObject
+  NimActivity = ref object of Activity
     n: int
 
-jexport NimActivity implements Activity:
+jexport NimActivity extends Activity:
   proc new() = super()  # TODO: or else?
 
   proc stringFromField(): string =
@@ -29,11 +25,11 @@ jexport NimActivity implements Activity:
 
   proc onCreate(b: Bundle) =
     this.super.onCreate(b)
-    # cast[Activity](this.super).onCreate(b)  #  Error: expression cannot be cast to Activity=ref Activity:ObjectType
     this.n = 44
     let v = TextView.new(this)
-    v.setText(this.stringFromField())
+    # v.setText(this.stringFromField())
+    v.setText(cast[CharSequence](this.stringFromField()))
     this.setContentView(v)
 
-jnimDexWrite("_gen_dex.nim")
+jnimDexWrite("jnim_gen_dex.nim")
 

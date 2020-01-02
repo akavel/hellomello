@@ -11,7 +11,10 @@ srcDir        = "src"
 
 requires "nim >= 1.0.2"
 requires "dali 0.3.0"
+# requires "https://github.com/akavel/jnim#dali"
 requires "jnim#dali"
+# requires "https://github.com/akavel/android#dali"
+requires "android"
 
 
 # Tasks
@@ -19,7 +22,7 @@ requires "jnim#dali"
 task dex, "Assemble a classes.dex file":
   mkDir("apk")
   exec("nim c -d:jnimGenDex hello.nim")
-  exec("nim c -r _gen_dex.nim")
+  exec("nim c -r jnim_gen_dex.nim apk/classes.dex libhello-mello.so")
 
 task so, "Compile and link an Android .so library":
   mkDir("apk")
