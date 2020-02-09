@@ -27,9 +27,11 @@ jexport NimActivity extends Activity:
     this.super.onCreate(b)
     this.n = 44
     let v = TextView.new(this)
-    # v.setText(this.stringFromField())
-    v.setText(cast[CharSequence](this.stringFromField()))
+    # # v.setText(this.stringFromField())
+    # v.setText(cast[CharSequence](this.stringFromField()))
+    v.setText(cast[CharSequence]("foobar"))
     this.setContentView(v)
 
 jnimDexWrite("jnim_gen_dex.nim")
+
 
