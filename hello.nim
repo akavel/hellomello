@@ -9,43 +9,31 @@ import android/os/bundle
 import android/view/view
 import android/util/log
 
-jclassDef java.lang.CharSequence of JVMObject
+const
+  black: int32 = 0xff000000  # Color.BLACK
+  white: int32 = 0xffffffff  # Color.WHITE
 
-jclass android.widget.TextView of View:
-  proc new(c: Context)
-  proc setText(s: CharSequence)
+type DrawView = ref object of View
+
+jexport DrawView extends View:
+  proc new(c: Context) = super(c)  # TODO: or else?
+  proc onDraw(c: Canvas) =
+    var p = Paint.new()
+    p.setColor(black)
+    c.drawLine(0, 0, 20, 20, p)
+    c.drawLine(20, 0, 0, 20, p)
 
 
-type
-  NimActivity = ref object of Activity
-    n: int
+type NimActivity = ref object of Activity
 
 jexport NimActivity extends Activity:
   proc new() = super()  # TODO: or else?
 
-  proc stringFromField(): string =
-    $this.n
-
   proc onCreate(b: Bundle) =
-    discard Log.d("hellomello", "after onCreate prologue - START")
     this.super.onCreate(b)
-    discard Log.d("hellomello", "after super.onCreate")
-    this.n = 44
-    discard Log.d("hellomello", "after this.n=44")
-    let v = TextView.new(this)
-    discard Log.d("hellomello", "after TextView.new(this)")
-    # NOTE: above is the last Log.d line reached before String.new was added
-
-    let s = String.new("barfoo")
-    discard Log.d("hellomello", "after String.new('barfoo')")
-
-    # # v.setText(this.stringFromField())
-    # v.setText(cast[CharSequence](this.stringFromField()))
-    #v.setText(cast[CharSequence]("foobar"))
-    v.setText(cast[CharSequence](s))
-    discard Log.d("hellomello", "after TextView.setText(...)")
+    var v = DrawView.new(this)
+    v.setBackgroundColor(white)
     this.setContentView(v)
-    discard Log.d("hellomello", "after this.setContentView(TextView) - END")
 
 jnimDexWrite("jnim_gen_dex.nim")
 
