@@ -13,8 +13,8 @@ requires "nim >= 1.0.2"
 requires "dali 0.3.0"
 requires "https://github.com/akavel/jnim#dali"
 # requires "jnim#dali"
-requires "https://github.com/akavel/android#dali"
-# requires "android"
+# requires "https://github.com/akavel/android#dali"
+requires "android"
 
 
 # Tasks
