@@ -3,6 +3,8 @@ import jnim
 
 import jnim/java/lang
 
+## Android system classes
+
 import android/content/context
 import android/app/activity
 import android/os/bundle
@@ -15,22 +17,51 @@ jclass android.graphics.Paint of JVMObject:
 
 jclass android.graphics.Canvas of JVMObject:
   proc drawLine(x1, y1, x2, y2: jfloat, p: Paint)
+  proc drawCircle(x, y, r: jfloat, p: Paint)
+  proc drawRect(left, top, right, bottom: jfloat, p: Paint)
 
 const
   black: int32 = 0xff000000'i32  # Color.BLACK
   white: int32 = 0xffffffff'i32  # Color.WHITE
+  blue: int32 =  0xffaaaaff'i32
+  green: int32 = 0xff00ff00'i32
+  red: int32 =   0xffff0000'i32
 
-type DrawView = ref object of View
 
-jexport DrawView extends View:
+## Main code
+
+type FlappyView = ref object of View
+  walls: seq[tuple[x, y: int]]
+  x, y: int
+  score: int
+  live: bool
+  wallW2, holeH, birdR: int
+  pWall, pBird: Paint
+
+jexport FlappyView extends View:
   proc new(c: Context) = super(c)  # TODO: or else?
+  proc init(w, h: int32) =
+    this.setBackgroundColor(blue)
+    this.y = int(h / 2)
+    this.walls = @[(int(w/2), this.y), (int(w), int(h/3*2))]
+    this.live = true
+    this.wallW2 = int(w/5/2)
+    this.holeH = int(h/6)
+    this.birdR = int(h/20)
+    this.pWall = Paint.new()
+    this.pWall.setColor(green)
+    this.pBird = Paint.new()
+    this.pBird.setColor(red)
   proc onDraw(c: Canvas) =
-    discard Log.d("hellomello", "DrawView.onDraw begin")
-    var p = Paint.new()
-    p.setColor(black)
-    c.drawLine(0, 0, 20, 20, p)
-    c.drawLine(20, 0, 0, 20, p)
-    discard Log.d("hellomello", "DrawView.onDraw end")
+    var
+      width = this.getWidth()
+      height = this.getHeight()
+    if this.walls.len == 0:
+      this.init(width, height)
+    for w in this.walls:
+      c.drawRect(w.x.float-this.wallW2.float, 0.float, w.x.float+this.wallW2.float, w.y.float-this.holeH.float, this.pWall)
+      c.drawRect(w.x.float-this.wallW2.float, w.y.float+this.holeH.float, w.x.float+this.wallW2.float, height.float, this.pWall)
+    c.drawCircle(width/2, this.y.float, this.birdR.float, this.pBird)
 
 
 type NimActivity = ref object of Activity
@@ -41,11 +72,7 @@ jexport NimActivity extends Activity:
   proc onCreate(b: Bundle) =
     discard Log.d("hellomello", "NimActivity.onCreate begin")
     this.super.onCreate(b)
-    discard Log.d("hellomello", "NimActivity after super.onCreate")
-    var v = DrawView.new(this)
-    discard Log.d("hellomello", "NimActivity after DrawView.new")
-    v.setBackgroundColor(white)
-    discard Log.d("hellomello", "NimActivity after v.setBackgroundColor")
+    var v = FlappyView.new(this)
     this.setContentView(v)
     discard Log.d("hellomello", "NimActivity.onCreate end")
 
