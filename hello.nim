@@ -30,38 +30,45 @@ const
 
 ## Main code
 
-type FlappyView = ref object of View
-  walls: seq[tuple[x, y: int]]
-  x, y: int
-  score: int
-  live: bool
-  wallW2, holeH, birdR: int
-  pWall, pBird: Paint
+type
+  FlappyViewData = ref object
+    walls: seq[tuple[x, y: int]]
+    x, y: int
+    score: int
+    live: bool
+    wallW2, holeH, birdR: int
+    pWall, pBird: Paint
+  FlappyView = ref object of View
+    # TODO: can't we avoid this indirection level?
+    data: FlappyViewData
 
 jexport FlappyView extends View:
   proc new(c: Context) = super(c)  # TODO: or else?
-  proc init(w, h: int32) =
+  proc init0() =
     this.setBackgroundColor(blue)
-    this.y = int(h / 2)
-    this.walls = @[(int(w/2), this.y), (int(w), int(h/3*2))]
-    this.live = true
-    this.wallW2 = int(w/5/2)
-    this.holeH = int(h/6)
-    this.birdR = int(h/20)
-    this.pWall = Paint.new()
-    this.pWall.setColor(green)
-    this.pBird = Paint.new()
-    this.pBird.setColor(red)
+    this.data.x = 30
+    this.data.pWall = Paint.new()
+    this.data.pWall.setColor(green)
+    this.data.pBird = Paint.new()
+    this.data.pBird.setColor(red)
+  proc init(w, h: int32) =
+    this.data.y = int(h / 2)
+    this.data.walls = @[(int(w/2), this.data.y), (int(w), int(h/3*2))]
+    this.data.live = true
+    this.data.wallW2 = int(w/5/2)
+    this.data.holeH = int(h/6)
+    this.data.birdR = int(h/20)
   proc onDraw(c: Canvas) =
     var
       width = this.getWidth()
       height = this.getHeight()
-    if this.walls.len == 0:
+    let d = this.data
+    if d.walls.len == 0:
       this.init(width, height)
-    for w in this.walls:
-      c.drawRect(w.x.float-this.wallW2.float, 0.float, w.x.float+this.wallW2.float, w.y.float-this.holeH.float, this.pWall)
-      c.drawRect(w.x.float-this.wallW2.float, w.y.float+this.holeH.float, w.x.float+this.wallW2.float, height.float, this.pWall)
-    c.drawCircle(width/2, this.y.float, this.birdR.float, this.pBird)
+    for w in d.walls:
+      c.drawRect(w.x.float-d.wallW2.float, 0.float, w.x.float+d.wallW2.float, w.y.float-d.holeH.float, d.pWall)
+      c.drawRect(w.x.float-d.wallW2.float, w.y.float+d.holeH.float, w.x.float+d.wallW2.float, height.float, d.pWall)
+    c.drawCircle(width/2, d.y.float, d.birdR.float, d.pBird)
 
 
 type NimActivity = ref object of Activity
@@ -73,6 +80,7 @@ jexport NimActivity extends Activity:
     discard Log.d("hellomello", "NimActivity.onCreate begin")
     this.super.onCreate(b)
     var v = FlappyView.new(this)
+    v.init0()
     this.setContentView(v)
     discard Log.d("hellomello", "NimActivity.onCreate end")
 
