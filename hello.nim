@@ -1,24 +1,23 @@
 {.experimental: "codeReordering".}
 import jnim
 
-import jnim/java/lang
-
 ## Android system classes
 
+import jnim/java/lang
 import android/content/context
 import android/app/activity
 import android/os/bundle
-import android/view/view
+import android/graphics/[paint, canvas]
+import android/view/[view, surface, surface_view, surface_holder]
 import android/util/log
 
-jclass android.graphics.Paint of JVMObject:
-  proc new()
-  proc setColor(c: jint)
-
-jclass android.graphics.Canvas of JVMObject:
-  proc drawLine(x1, y1, x2, y2: jfloat, p: Paint)
-  proc drawCircle(x, y, r: jfloat, p: Paint)
-  proc drawRect(left, top, right, bottom: jfloat, p: Paint)
+jclass java.lang.Thread of JVMObject:
+  proc new(r: Runnable)
+  proc run()
+  proc join()
+  proc sleep(millis: jlong) {.`static`.}
+  proc interrupt()
+  proc isInterrupted(): jboolean {.`static`.}
 
 const
   black: int32 = 0xff000000'i32  # Color.BLACK
@@ -39,8 +38,8 @@ type
     wallW2, holeH, birdR: int
     pWall, pBird: Paint
 
-    renderer: Thread
     holder: SurfaceHolder
+    renderer: Thread
 
   FlappyView = ref object of View
     # TODO: can't we avoid this indirection level?
@@ -67,18 +66,31 @@ jexport FlappyView extends SurfaceView implements Runnable:
     d.holeH = int(h/6)
     d.birdR = int(h/20)
 
-    d.renderer = Thread.new(this)
-    d.holder = this.getHolder()
+    # TODO: can we avoid 'super' below? getWidth() doesn't complain, why?
+    d.holder = this.super.getHolder()
+    # TODO: can we avoid cast below?
+    d.renderer = Thread.new(cast[Runnable](this))
+    d.renderer.run()
 
   proc stop() =
     this.data.renderer.interrupt()
+    this.data.renderer.join()
+
+  proc draw(c: Canvas) =
+    let d = this.data
+    let height = this.getHeight()
+    let width = this.getWidth()
+    for w in d.walls:
+      c.drawRect(w.x.float-d.wallW2.float, 0.float, w.x.float+d.wallW2.float, w.y.float-d.holeH.float, d.pWall)
+      c.drawRect(w.x.float-d.wallW2.float, w.y.float+d.holeH.float, w.x.float+d.wallW2.float, height.float, d.pWall)
+    c.drawCircle(width/2, d.y.float, d.birdR.float, d.pBird)
 
   proc run() =
     let d = this.data
     while true:
-      if this.interrupted():
+      if Thread.isInterrupted().bool:
         break
-      if !d.holder.getSurface().isValid():
+      if not d.holder.getSurface().isValid().bool:
         Thread.sleep(1000)
         continue
       let c = d.holder.lockCanvas()
@@ -87,13 +99,6 @@ jexport FlappyView extends SurfaceView implements Runnable:
       this.draw(c)
       d.holder.unlockCanvasAndPost(c)
       Thread.sleep(16)  # VERY roughly ~60fps
-
-  proc draw(c: Canvas) =
-    let d = this.data
-    for w in d.walls:
-      c.drawRect(w.x.float-d.wallW2.float, 0.float, w.x.float+d.wallW2.float, w.y.float-d.holeH.float, d.pWall)
-      c.drawRect(w.x.float-d.wallW2.float, w.y.float+d.holeH.float, w.x.float+d.wallW2.float, height.float, d.pWall)
-    c.drawCircle(width/2, d.y.float, d.birdR.float, d.pBird)
 
 
 type
@@ -109,15 +114,15 @@ jexport NimActivity extends Activity:
     discard Log.d("hellomello", "NimActivity.onCreate begin")
     this.super.onCreate(b)
     this.data.v = FlappyView.new(this)
-    this.setContentView(v)
+    this.setContentView(this.data.v)
     discard Log.d("hellomello", "NimActivity.onCreate end")
 
   proc onResume() =
-    super.onResume()
+    this.super.onResume()
     this.data.v.start()
 
   proc onPause() =
-    super.onPause()
+    this.super.onPause()
     this.data.v.stop()
 
 when defined(jnimGenDex):
