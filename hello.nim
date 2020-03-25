@@ -95,18 +95,31 @@ jexport FlappyView extends SurfaceView implements Runnable:
   proc run() =
     discard Log.d("hellomello", "FlappyView.run begin")
     let d = this.data
+    discard Log.d("hellomello", "FlappyView.run after d=this.data")
     while true:
+      discard Log.d("hellomello", "FlappyView.run after while start")
       if Thread.interrupted().bool:
+        discard Log.d("hellomello", "FlappyView.run after interrupted break")
         break
+      discard Log.d("hellomello", "FlappyView.run after if interrupted")
       if not d.holder.getSurface().isValid().bool:
+        discard Log.d("hellomello", "FlappyView.run after not isValid")
         Thread.sleep(1000)
+        discard Log.d("hellomello", "FlappyView.run after sleep(1000)")
         continue
+      discard Log.d("hellomello", "FlappyView.run after if not isValid")
       let c = d.holder.lockCanvas()
+      discard Log.d("hellomello", "FlappyView.run after lockCanvas")
       if c == nil:
+        discard Log.d("hellomello", "FlappyView.run after c==nil")
         continue
+      discard Log.d("hellomello", "FlappyView.run after if c==nil")
       this.draw(c)
+      discard Log.d("hellomello", "FlappyView.run after draw")
       d.holder.unlockCanvasAndPost(c)
+      discard Log.d("hellomello", "FlappyView.run after unlockCanvasAndPost")
       Thread.sleep(16)  # VERY roughly ~60fps
+      discard Log.d("hellomello", "FlappyView.run after sleep(16)")
     discard Log.d("hellomello", "FlappyView.run end")
 
 
