@@ -17,7 +17,8 @@ jclass java.lang.Thread of JVMObject:
   proc join()
   proc sleep(millis: jlong) {.`static`.}
   proc interrupt()
-  proc isInterrupted(): jboolean {.`static`.}
+  proc interrupted(): jboolean {.`static`.}
+  proc isInterrupted(): jboolean
 
 const
   black: int32 = 0xff000000'i32  # Color.BLACK
@@ -95,7 +96,7 @@ jexport FlappyView extends SurfaceView implements Runnable:
     discard Log.d("hellomello", "FlappyView.run begin")
     let d = this.data
     while true:
-      if Thread.isInterrupted().bool:
+      if Thread.interrupted().bool:
         break
       if not d.holder.getSurface().isValid().bool:
         Thread.sleep(1000)
