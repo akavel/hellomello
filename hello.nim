@@ -128,8 +128,6 @@ jexport NimActivity extends Activity:
       discard Log.d("hellomello", "NimActivity.onCreate this.data == nil")
     else:
       discard Log.d("hellomello", "NimActivity.onCreate this.data != nil")
-    new(this.data)
-    discard Log.d("hellomello", "NimActivity.onCreate after new(this.data)")
     this.data.v = v
     discard Log.d("hellomello", "NimActivity.onCreate after this.data.v assignment")
     this.setContentView(this.data.v)
