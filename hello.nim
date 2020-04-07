@@ -13,7 +13,7 @@ import android/util/log
 
 jclass java.lang.Thread of JVMObject:
   proc new(r: Runnable)
-  proc run()
+  proc start()
   proc join()
   proc sleep(millis: jlong) {.`static`.}
   proc interrupt()
@@ -46,12 +46,24 @@ type
     # TODO: can't we avoid this indirection level?
     data: FlappyViewData
 
-jexport FlappyView extends SurfaceView implements Runnable:
+jexport FlappyView extends SurfaceView implements Runnable, SurfaceHolderCallback:
   proc new(c: Context) = super(c)  # TODO: or else?
+
+  proc surfaceChanged*(holder: SurfaceHolder; format, width, height: jint) =
+    discard Log.d("hellomello", "FlappyView.surfaceChanged")
+  proc surfaceCreated*(holder: SurfaceHolder) =
+    # let d = this.data
+    # if d.renderer != nil:
+    #   d.renderer.join()
+    # d.renderer = Thread.new(cast[Runnable](this))
+    discard Log.d("hellomello", "FlappyView.surfaceCreated")
+  proc surfaceDestroyed*(holder: SurfaceHolder) =
+    discard Log.d("hellomello", "FlappyView.surfaceDestroyed")
 
   proc start() =
     discard Log.d("hellomello", "FlappyView.start begin")
     this.setBackgroundColor(blue)
+    this.setWillNotDraw(false)
     let
       w = this.getWidth()
       h = this.getHeight()
@@ -72,7 +84,7 @@ jexport FlappyView extends SurfaceView implements Runnable:
     d.holder = this.super.getHolder()
     # TODO: can we avoid cast below?
     d.renderer = Thread.new(cast[Runnable](this))
-    d.renderer.run()
+    d.renderer.start()
     discard Log.d("hellomello", "FlappyView.start end")
 
   proc stop() =
@@ -81,8 +93,8 @@ jexport FlappyView extends SurfaceView implements Runnable:
     this.data.renderer.join()
     discard Log.d("hellomello", "FlappyView.stop end")
 
-  proc draw(c: Canvas) =
-    discard Log.d("hellomello", "FlappyView.draw begin")
+  proc dodraw(c: Canvas) =
+    discard Log.d("hellomello", "FlappyView.dodraw begin")
     let d = this.data
     let height = this.getHeight()
     let width = this.getWidth()
@@ -90,7 +102,7 @@ jexport FlappyView extends SurfaceView implements Runnable:
       c.drawRect(w.x.float-d.wallW2.float, 0.float, w.x.float+d.wallW2.float, w.y.float-d.holeH.float, d.pWall)
       c.drawRect(w.x.float-d.wallW2.float, w.y.float+d.holeH.float, w.x.float+d.wallW2.float, height.float, d.pWall)
     c.drawCircle(width/2, d.y.float, d.birdR.float, d.pBird)
-    discard Log.d("hellomello", "FlappyView.draw end")
+    discard Log.d("hellomello", "FlappyView.dodraw end")
 
   proc run() =
     discard Log.d("hellomello", "FlappyView.run begin")
@@ -102,6 +114,7 @@ jexport FlappyView extends SurfaceView implements Runnable:
         discard Log.d("hellomello", "FlappyView.run after interrupted break")
         break
       discard Log.d("hellomello", "FlappyView.run after if interrupted")
+      discard Log.d("hellomello", "FlappyView.run isValid? " & $this.super.getHolder().getSurface().isValid())
       if not d.holder.getSurface().isValid().bool:
         discard Log.d("hellomello", "FlappyView.run after not isValid")
         Thread.sleep(1000)
@@ -114,8 +127,8 @@ jexport FlappyView extends SurfaceView implements Runnable:
         discard Log.d("hellomello", "FlappyView.run after c==nil")
         continue
       discard Log.d("hellomello", "FlappyView.run after if c==nil")
-      this.draw(c)
-      discard Log.d("hellomello", "FlappyView.run after draw")
+      this.dodraw(c)
+      discard Log.d("hellomello", "FlappyView.run after dodraw")
       d.holder.unlockCanvasAndPost(c)
       discard Log.d("hellomello", "FlappyView.run after unlockCanvasAndPost")
       Thread.sleep(16)  # VERY roughly ~60fps
@@ -135,37 +148,23 @@ jexport NimActivity extends Activity:
   proc onCreate(b: Bundle) =
     discard Log.d("hellomello", "NimActivity.onCreate begin")
     this.super.onCreate(b)
-    discard Log.d("hellomello", "NimActivity.onCreate after super.onCreate")
     let v = FlappyView.new(this)
-    discard Log.d("hellomello", "NimActivity.onCreate after FlappyView.new")
-    if this.data == nil:
-      discard Log.d("hellomello", "NimActivity.onCreate this.data == nil")
-    else:
-      discard Log.d("hellomello", "NimActivity.onCreate this.data != nil")
     this.data.v = v
-    discard Log.d("hellomello", "NimActivity.onCreate after this.data.v assignment")
-    this.setContentView(this.data.v)
+    v.super.getHolder().addCallback(v)
+    # this.super.setContentView(this.data.v)
+    this.super.setContentView(v)
+    # v.super.setVisibility(0)  # VISIBLE
     discard Log.d("hellomello", "NimActivity.onCreate end")
 
   proc onResume() =
     discard Log.d("hellomello", "NimActivity.onResume begin")
     this.super.onResume()
-    discard Log.d("hellomello", "NimActivity.onResume after super.onResume")
-    if this.data == nil:
-      discard Log.d("hellomello", "NimActivity.onResume this.data == nil")
-    else:
-      discard Log.d("hellomello", "NimActivity.onResume this.data != nil")
-    if this.data.v == nil:
-      discard Log.d("hellomello", "NimActivity.onResume this.data.v == nil")
-    else:
-      discard Log.d("hellomello", "NimActivity.onResume this.data.v != nil")
     this.data.v.start()
     discard Log.d("hellomello", "NimActivity.onResume end")
 
   proc onPause() =
     discard Log.d("hellomello", "NimActivity.onPause begin")
     this.super.onPause()
-    discard Log.d("hellomello", "NimActivity.onPause after super.onPause")
     this.data.v.stop()
     discard Log.d("hellomello", "NimActivity.onPause end")
 
