@@ -36,6 +36,7 @@ type
   FlappyViewData = ref object
     walls: seq[tuple[x, y: int]]
     x, y: int
+    vy: int
     score: int
     live: bool
     wallW2, holeH, birdR: int
@@ -110,9 +111,27 @@ expandMacros: expandMacros:
 
     proc logic(c: Canvas) =
       # discard Log.d("hellomello", "FlappyView.logic begin")
-      let d = this.data
-      let height = this.getHeight()
-      let width = this.getWidth()
+      let
+        d = this.data
+        height = this.getHeight()
+        width = this.getWidth()
+
+      if not d.live:
+        d.live = true
+        d.y = int(height/2)
+        d.vy = -17
+
+      d.lock.withLock:
+        if d.touched:
+          d.touched = false
+          d.vy = -17
+      d.vy.inc
+      d.y += d.vy
+
+      # TEMPORARY:
+      if d.y > height or d.y < 0:
+        d.live = false
+
       c.drawPaint(d.pSky)
       for w in d.walls.mitems:
         c.drawRect(w.x.float-d.wallW2.float, 0.float, w.x.float+d.wallW2.float, w.y.float-d.holeH.float, d.pWall)
@@ -122,10 +141,6 @@ expandMacros: expandMacros:
           # w.y = random(200, height-200)
         w.x -= 3
       c.drawCircle(width/2, d.y.float, d.birdR.float, d.pBird)
-      d.lock.withLock:
-        if d.touched:
-          d.touched = false
-          d.y -= 6
       # if not d.isnil and not d.touched.isnil and d.touched.get:
       #   d.touched.set(false)
       #   d.y.dec
