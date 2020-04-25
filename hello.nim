@@ -96,9 +96,13 @@ expandMacros: expandMacros:
       let d = this.data
       let height = this.getHeight()
       let width = this.getWidth()
-      for w in d.walls:
+      for w in d.walls.mitems:
         c.drawRect(w.x.float-d.wallW2.float, 0.float, w.x.float+d.wallW2.float, w.y.float-d.holeH.float, d.pWall)
         c.drawRect(w.x.float-d.wallW2.float, w.y.float+d.holeH.float, w.x.float+d.wallW2.float, height.float, d.pWall)
+        if w.x < 0:
+          w.x = width.int
+          # w.y = random(200, height-200)
+        w.x -= 3
       c.drawCircle(width/2, d.y.float, d.birdR.float, d.pBird)
       # discard Log.d("hellomello", "FlappyView.logic end")
 
