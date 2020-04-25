@@ -8,7 +8,7 @@ import android/content/context
 import android/app/activity
 import android/os/bundle
 import android/graphics/[paint, canvas]
-import android/view/[view, surface, surface_view, surface_holder]
+import android/view/[view, surface, surface_view, surface_holder, motion_event]
 import android/util/log
 
 jclass java.lang.Thread of JVMObject:
@@ -76,6 +76,12 @@ expandMacros: expandMacros:
     proc surfaceDestroyed*(holder: SurfaceHolder) =
       discard Log.d("hellomello", "FlappyView.surfaceDestroyed")
       discard
+
+    proc onTouchEvent*(evt: MotionEvent): jboolean =
+      discard Log.d("hellomello", "ON TOUCH EVENT")
+      # return false
+      # FIXME: can we avoid cast below?
+      return this.super.onTouchEvent(evt).jboolean
 
     proc start() =
       discard Log.d("hellomello", "FlappyView.start begin")
