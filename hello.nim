@@ -123,7 +123,8 @@ jexport FlappyView extends SurfaceView implements Runnable, SurfaceHolderCallbac
       discard Log.d("hellomello", "FlappyView.run after if not isValid")
       let c = d.holder.lockCanvas()
       discard Log.d("hellomello", "FlappyView.run after lockCanvas")
-      if c == nil:
+      if isnil c:
+      # if c == nil:  # SIGSEGV
         discard Log.d("hellomello", "FlappyView.run after c==nil")
         continue
       discard Log.d("hellomello", "FlappyView.run after if c==nil")
