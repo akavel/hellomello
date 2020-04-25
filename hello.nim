@@ -40,8 +40,6 @@ type
     pWall, pBird: Paint
 
     holder: SurfaceHolder
-    runnableRef: jobject
-    runnable: Runnable
     renderer: Thread
 
   FlappyView = ref object of View
@@ -95,12 +93,7 @@ expandMacros: expandMacros:
       # TODO: can we avoid 'super' below? getWidth() doesn't complain, why?
       d.holder = this.super.getHolder()
       # TODO: can we avoid cast below?
-      d.runnableRef = theEnv.newGlobalRef(this.get)
-      # d.runnable = typeof(Runnable).fromJObject(this.get)
-      d.runnable = typeof(Runnable).fromJObject(d.runnableRef)
-      GC_ref(d.runnable)
-      # d.renderer = Thread.new(cast[Runnable](this))
-      d.renderer = Thread.new(d.runnable)
+      d.renderer = Thread.new(cast[Runnable](this))
       d.renderer.start()
       discard Log.d("hellomello", "FlappyView.start end")
 
@@ -108,10 +101,6 @@ expandMacros: expandMacros:
       discard Log.d("hellomello", "FlappyView.stop begin")
       this.data.renderer.interrupt()
       this.data.renderer.join()
-      this.data.runnable = nil
-      # theEnv.deleteGlobalRef(this.data.runnable.get)
-      theEnv.deleteGlobalRef(this.data.runnableRef)
-      GC_unref(this.data.runnable)
       discard Log.d("hellomello", "FlappyView.stop end")
 
     proc dodraw(c: Canvas) =
@@ -140,9 +129,6 @@ expandMacros: expandMacros:
 
     proc run() =
       discard Log.d("hellomello", "FlappyView.run begin")
-      # GC_disable()
-      GC_ref(this)
-      defer: GC_unref(this)
       let d = this.data
       discard Log.d("hellomello", "FlappyView.run after d=this.data")
       while true:
@@ -151,7 +137,7 @@ expandMacros: expandMacros:
           discard Log.d("hellomello", "FlappyView.run after interrupted break")
           break
         discard Log.d("hellomello", "FlappyView.run after if interrupted")
-        # discard Log.d("hellomello", "FlappyView.run isValid? " & $this.super.getHolder().getSurface().isValid())
+        discard Log.d("hellomello", "FlappyView.run isValid? " & $this.super.getHolder().getSurface().isValid())
         if not d.holder.getSurface().isValid().bool:
           discard Log.d("hellomello", "FlappyView.run after not isValid")
           Thread.sleep(1000)
