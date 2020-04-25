@@ -140,6 +140,9 @@ expandMacros: expandMacros:
 
     proc run() =
       discard Log.d("hellomello", "FlappyView.run begin")
+      # GC_disable()
+      GC_ref(this)
+      defer: GC_unref(this)
       let d = this.data
       discard Log.d("hellomello", "FlappyView.run after d=this.data")
       while true:
