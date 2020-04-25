@@ -1,6 +1,7 @@
 {.experimental: "codeReordering".}
 import jnim, macros
 import locks
+import random
 
 ## Android system classes
 
@@ -41,6 +42,8 @@ type
     live: bool
     wallW2, holeH, birdR: int
     pSky, pWall, pBird: Paint
+
+    rng: Rand
 
     holder: SurfaceHolder
     renderer: Thread
@@ -95,6 +98,7 @@ expandMacros: expandMacros:
       discard Log.d("hellomello", "FlappyView.start begin")
       let d = this.data
       d.lock.initLock
+      d.rng = initRand(123)
       # d.touched = AtomicBoolean.new()
       # TODO: can we avoid 'super' below? getWidth() doesn't complain, why?
       d.holder = this.super.getHolder()
@@ -138,7 +142,7 @@ expandMacros: expandMacros:
         c.drawRect(w.x.float-d.wallW2.float, w.y.float+d.holeH.float, w.x.float+d.wallW2.float, height.float, d.pWall)
         if w.x < 0:
           w.x = width.int
-          # w.y = random(200, height-200)
+          w.y = d.rng.rand(200 .. height.int-200)
         w.x -= 3
       c.drawCircle(width/2, d.y.float, d.birdR.float, d.pBird)
       # if not d.isnil and not d.touched.isnil and d.touched.get:
