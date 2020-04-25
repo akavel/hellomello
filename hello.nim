@@ -91,8 +91,8 @@ expandMacros: expandMacros:
       this.data.renderer.join()
       discard Log.d("hellomello", "FlappyView.stop end")
 
-    proc dodraw(c: Canvas) =
-      # discard Log.d("hellomello", "FlappyView.dodraw begin")
+    proc logic(c: Canvas) =
+      # discard Log.d("hellomello", "FlappyView.logic begin")
       let d = this.data
       let height = this.getHeight()
       let width = this.getWidth()
@@ -100,7 +100,7 @@ expandMacros: expandMacros:
         c.drawRect(w.x.float-d.wallW2.float, 0.float, w.x.float+d.wallW2.float, w.y.float-d.holeH.float, d.pWall)
         c.drawRect(w.x.float-d.wallW2.float, w.y.float+d.holeH.float, w.x.float+d.wallW2.float, height.float, d.pWall)
       c.drawCircle(width/2, d.y.float, d.birdR.float, d.pBird)
-      # discard Log.d("hellomello", "FlappyView.dodraw end")
+      # discard Log.d("hellomello", "FlappyView.logic end")
 
     proc run() =
       discard Log.d("hellomello", "FlappyView.run begin")
@@ -114,7 +114,7 @@ expandMacros: expandMacros:
         let c = d.holder.lockCanvas()
         if isnil c: # NOTE: SIGSEGV when `if c == nil:`
           continue
-        this.dodraw(c)
+        this.logic(c)
         d.holder.unlockCanvasAndPost(c)
         Thread.sleep(16)  # VERY roughly ~60fps
       discard Log.d("hellomello", "FlappyView.run end")
