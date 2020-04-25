@@ -1,5 +1,6 @@
 {.experimental: "codeReordering".}
 import jnim, macros
+import locks
 
 ## Android system classes
 
@@ -10,6 +11,7 @@ import android/os/bundle
 import android/graphics/[paint, canvas]
 import android/view/[view, surface, surface_view, surface_holder, motion_event]
 import android/util/log
+# import android/util/concurrent/atomic/atomic_boolean
 
 jclass java.lang.Thread of JVMObject:
   proc new(r: Runnable)
@@ -41,6 +43,9 @@ type
 
     holder: SurfaceHolder
     renderer: Thread
+
+    lock: Lock
+    touched: bool
 
   FlappyView = ref object of View
     # TODO: can't we avoid this indirection level?
@@ -79,6 +84,8 @@ expandMacros: expandMacros:
 
     proc onTouchEvent*(evt: MotionEvent): jboolean =
       discard Log.d("hellomello", "ON TOUCH EVENT")
+      this.data.lock.withLock:
+        this.data.touched = true
       # return false
       # FIXME: can we avoid cast below?
       return this.super.onTouchEvent(evt).jboolean
@@ -86,6 +93,8 @@ expandMacros: expandMacros:
     proc start() =
       discard Log.d("hellomello", "FlappyView.start begin")
       let d = this.data
+      d.lock.initLock
+      # d.touched = AtomicBoolean.new()
       # TODO: can we avoid 'super' below? getWidth() doesn't complain, why?
       d.holder = this.super.getHolder()
       # TODO: can we avoid cast below?
@@ -113,6 +122,13 @@ expandMacros: expandMacros:
           # w.y = random(200, height-200)
         w.x -= 3
       c.drawCircle(width/2, d.y.float, d.birdR.float, d.pBird)
+      d.lock.withLock:
+        if d.touched:
+          d.touched = false
+          d.y -= 6
+      # if not d.isnil and not d.touched.isnil and d.touched.get:
+      #   d.touched.set(false)
+      #   d.y.dec
       # discard Log.d("hellomello", "FlappyView.logic end")
 
     proc run() =
