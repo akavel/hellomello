@@ -37,7 +37,7 @@ type
     score: int
     live: bool
     wallW2, holeH, birdR: int
-    pWall, pBird: Paint
+    pSky, pWall, pBird: Paint
 
     holder: SurfaceHolder
     renderer: Thread
@@ -67,6 +67,8 @@ expandMacros: expandMacros:
       d.live = true
       ###
       d.x = 30
+      d.pSky = Paint.new()
+      d.pSky.setColor(blue)
       d.pWall = Paint.new()
       d.pWall.setColor(green)
       d.pBird = Paint.new()
@@ -96,6 +98,7 @@ expandMacros: expandMacros:
       let d = this.data
       let height = this.getHeight()
       let width = this.getWidth()
+      c.drawPaint(d.pSky)
       for w in d.walls.mitems:
         c.drawRect(w.x.float-d.wallW2.float, 0.float, w.x.float+d.wallW2.float, w.y.float-d.holeH.float, d.pWall)
         c.drawRect(w.x.float-d.wallW2.float, w.y.float+d.holeH.float, w.x.float+d.wallW2.float, height.float, d.pWall)
