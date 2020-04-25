@@ -81,8 +81,8 @@ expandMacros: expandMacros:
 
     proc start() =
       discard Log.d("hellomello", "FlappyView.start begin")
-      this.setBackgroundColor(blue)
-      this.setWillNotDraw(false)
+      # this.setBackgroundColor(blue)
+      # this.setWillNotDraw(false)
       let d = this.data
       # d.x = 30
       # d.pWall = Paint.new()
@@ -105,6 +105,7 @@ expandMacros: expandMacros:
 
     proc dodraw(c: Canvas) =
       discard Log.d("hellomello", "FlappyView.dodraw begin")
+      discard Log.d("hellomello", "canvas w/h =" & $(c.getWidth, c.getHeight))
       let d = this.data
       discard Log.d("hellomello", "FlappyView.dodraw after this.data")
       let height = this.getHeight()
@@ -123,6 +124,7 @@ expandMacros: expandMacros:
         discard Log.d("hellomello", $(w.x.float-d.wallW2.float, w.y.float+d.holeH.float, w.x.float+d.wallW2.float, height.float, d.pWall))
       discard Log.d("hellomello", "FlappyView.dodraw after for end")
       c.drawCircle(width/2, d.y.float, d.birdR.float, d.pBird)
+      discard Log.d("hellomello", "FlappyView.dodraw after drawCircle")
       discard Log.d("hellomello", "FlappyView.dodraw end")
 
     proc run() =
@@ -151,6 +153,10 @@ expandMacros: expandMacros:
         discard Log.d("hellomello", "FlappyView.run after if c==nil")
         this.dodraw(c)
         discard Log.d("hellomello", "FlappyView.run after dodraw")
+        var p = Paint.new()
+        p.setColor(white)
+        c.drawLine(0, 0, 20, 20, p)
+        c.drawLine(20, 0, 0, 20, p)
         d.holder.unlockCanvasAndPost(c)
         discard Log.d("hellomello", "FlappyView.run after unlockCanvasAndPost")
         Thread.sleep(16)  # VERY roughly ~60fps
