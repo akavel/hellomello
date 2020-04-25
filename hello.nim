@@ -52,14 +52,15 @@ expandMacros: expandMacros:
 
     proc surfaceChanged*(holder: SurfaceHolder; format, width, height: jint) =
       discard Log.d("hellomello", "FlappyView.surfaceChanged")
-      discard Log.d("hellomello", "w h = " & $(this.getWidth, this.getHeight))
+      # discard Log.d("hellomello", "w h = " & $(this.getWidth, this.getHeight))
+      discard
     proc surfaceCreated*(holder: SurfaceHolder) =
       # let d = this.data
       # if d.renderer != nil:
       #   d.renderer.join()
       # d.renderer = Thread.new(cast[Runnable](this))
       discard Log.d("hellomello", "FlappyView.surfaceCreated")
-      discard Log.d("hellomello", "w h = " & $(this.getWidth, this.getHeight))
+      # discard Log.d("hellomello", "w h = " & $(this.getWidth, this.getHeight))
       let
         w = this.getWidth()
         h = this.getHeight()
@@ -78,6 +79,7 @@ expandMacros: expandMacros:
       d.pBird.setColor(red)
     proc surfaceDestroyed*(holder: SurfaceHolder) =
       discard Log.d("hellomello", "FlappyView.surfaceDestroyed")
+      discard
 
     proc start() =
       discard Log.d("hellomello", "FlappyView.start begin")
@@ -104,63 +106,62 @@ expandMacros: expandMacros:
       discard Log.d("hellomello", "FlappyView.stop end")
 
     proc dodraw(c: Canvas) =
-      discard Log.d("hellomello", "FlappyView.dodraw begin")
-      discard Log.d("hellomello", "canvas w/h =" & $(c.getWidth, c.getHeight))
+      # discard Log.d("hellomello", "FlappyView.dodraw begin")
+      # discard Log.d("hellomello", "canvas w/h =" & $(c.getWidth, c.getHeight))
       let d = this.data
-      discard Log.d("hellomello", "FlappyView.dodraw after this.data")
+      # discard Log.d("hellomello", "FlappyView.dodraw after this.data")
       let height = this.getHeight()
-      discard Log.d("hellomello", "FlappyView.dodraw after this.getHeight")
+      # discard Log.d("hellomello", "FlappyView.dodraw after this.getHeight")
       let width = this.getWidth()
-      discard Log.d("hellomello", "FlappyView.dodraw after this.getWidth")
-      discard Log.d("hellomello", "width=" & $width)
+      # discard Log.d("hellomello", "FlappyView.dodraw after this.getWidth")
+      # discard Log.d("hellomello", "width=" & $width)
       for w in d.walls:
-        discard Log.d("hellomello", "FlappyView.dodraw after for start")
-        discard Log.d("hellomello", "this.getWidth=" & $this.getWidth)
+        # discard Log.d("hellomello", "FlappyView.dodraw after for start")
+        # discard Log.d("hellomello", "this.getWidth=" & $this.getWidth)
         c.drawRect(w.x.float-d.wallW2.float, 0.float, w.x.float+d.wallW2.float, w.y.float-d.holeH.float, d.pWall)
-        discard Log.d("hellomello", "FlappyView.dodraw after drawRect 1")
-        discard Log.d("hellomello", $(w.x.float-d.wallW2.float, 0.float, w.x.float+d.wallW2.float, w.y.float-d.holeH.float, d.pWall))
+        # discard Log.d("hellomello", "FlappyView.dodraw after drawRect 1")
+        # discard Log.d("hellomello", $(w.x.float-d.wallW2.float, 0.float, w.x.float+d.wallW2.float, w.y.float-d.holeH.float, d.pWall))
         c.drawRect(w.x.float-d.wallW2.float, w.y.float+d.holeH.float, w.x.float+d.wallW2.float, height.float, d.pWall)
-        discard Log.d("hellomello", "FlappyView.dodraw after drawRect 2")
-        discard Log.d("hellomello", $(w.x.float-d.wallW2.float, w.y.float+d.holeH.float, w.x.float+d.wallW2.float, height.float, d.pWall))
-      discard Log.d("hellomello", "FlappyView.dodraw after for end")
+        # discard Log.d("hellomello", "FlappyView.dodraw after drawRect 2")
+        # discard Log.d("hellomello", $(w.x.float-d.wallW2.float, w.y.float+d.holeH.float, w.x.float+d.wallW2.float, height.float, d.pWall))
+      # discard Log.d("hellomello", "FlappyView.dodraw after for end")
       c.drawCircle(width/2, d.y.float, d.birdR.float, d.pBird)
-      discard Log.d("hellomello", "FlappyView.dodraw after drawCircle")
-      discard Log.d("hellomello", "FlappyView.dodraw end")
+      # discard Log.d("hellomello", "FlappyView.dodraw after drawCircle")
+      # discard Log.d("hellomello", "FlappyView.dodraw end")
 
     proc run() =
       discard Log.d("hellomello", "FlappyView.run begin")
       let d = this.data
-      discard Log.d("hellomello", "FlappyView.run after d=this.data")
+      # discard Log.d("hellomello", "FlappyView.run after d=this.data")
       while true:
-        discard Log.d("hellomello", "FlappyView.run after while start")
+        # discard Log.d("hellomello", "FlappyView.run after while start")
         if Thread.interrupted().bool:
-          discard Log.d("hellomello", "FlappyView.run after interrupted break")
+          # discard Log.d("hellomello", "FlappyView.run after interrupted break")
           break
-        discard Log.d("hellomello", "FlappyView.run after if interrupted")
-        discard Log.d("hellomello", "FlappyView.run isValid? " & $this.super.getHolder().getSurface().isValid())
+        # discard Log.d("hellomello", "FlappyView.run after if interrupted")
+        # discard Log.d("hellomello", "FlappyView.run isValid? " & $this.super.getHolder().getSurface().isValid())
         if not d.holder.getSurface().isValid().bool:
-          discard Log.d("hellomello", "FlappyView.run after not isValid")
+          # discard Log.d("hellomello", "FlappyView.run after not isValid")
           Thread.sleep(1000)
-          discard Log.d("hellomello", "FlappyView.run after sleep(1000)")
+          # discard Log.d("hellomello", "FlappyView.run after sleep(1000)")
           continue
-        discard Log.d("hellomello", "FlappyView.run after if not isValid")
+        # discard Log.d("hellomello", "FlappyView.run after if not isValid")
         let c = d.holder.lockCanvas()
-        discard Log.d("hellomello", "FlappyView.run after lockCanvas")
-        if isnil c:
-        # if c == nil:  # SIGSEGV
-          discard Log.d("hellomello", "FlappyView.run after c==nil")
+        # discard Log.d("hellomello", "FlappyView.run after lockCanvas")
+        if isnil c: # NOTE: SIGSEGV when `if c == nil:`
+          # discard Log.d("hellomello", "FlappyView.run after c==nil")
           continue
-        discard Log.d("hellomello", "FlappyView.run after if c==nil")
+        # discard Log.d("hellomello", "FlappyView.run after if c==nil")
         this.dodraw(c)
-        discard Log.d("hellomello", "FlappyView.run after dodraw")
-        var p = Paint.new()
-        p.setColor(white)
-        c.drawLine(0, 0, 20, 20, p)
-        c.drawLine(20, 0, 0, 20, p)
+        # discard Log.d("hellomello", "FlappyView.run after dodraw")
+        # var p = Paint.new()
+        # p.setColor(white)
+        # c.drawLine(0, 0, 20, 20, p)
+        # c.drawLine(20, 0, 0, 20, p)
         d.holder.unlockCanvasAndPost(c)
-        discard Log.d("hellomello", "FlappyView.run after unlockCanvasAndPost")
+        # discard Log.d("hellomello", "FlappyView.run after unlockCanvasAndPost")
         Thread.sleep(16)  # VERY roughly ~60fps
-        discard Log.d("hellomello", "FlappyView.run after sleep(16)")
+        # discard Log.d("hellomello", "FlappyView.run after sleep(16)")
       discard Log.d("hellomello", "FlappyView.run end")
 
 
