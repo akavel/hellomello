@@ -59,9 +59,9 @@ expandMacros: expandMacros:
         w = this.getWidth()
         h = this.getHeight()
         d = this.data
-      d.walls = @[(int(w/2), this.data.y), (int(w), int(h/3*2))]
-      d.wallW2 = int(w/5/2)
       d.y = int(h / 2)
+      d.walls = @[(int(w/2), d.y), (int(w), int(h/3*2))]
+      d.wallW2 = int(w/5/2)
       d.holeH = int(h/6)
       d.birdR = int(h/20)
       d.live = true
