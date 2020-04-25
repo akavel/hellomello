@@ -97,11 +97,18 @@ expandMacros: expandMacros:
     proc dodraw(c: Canvas) =
       discard Log.d("hellomello", "FlappyView.dodraw begin")
       let d = this.data
+      discard Log.d("hellomello", "FlappyView.dodraw after this.data")
       let height = this.getHeight()
+      discard Log.d("hellomello", "FlappyView.dodraw after this.getHeight")
       let width = this.getWidth()
+      discard Log.d("hellomello", "FlappyView.dodraw after this.getWidth")
       for w in d.walls:
+        discard Log.d("hellomello", "FlappyView.dodraw after for start")
         c.drawRect(w.x.float-d.wallW2.float, 0.float, w.x.float+d.wallW2.float, w.y.float-d.holeH.float, d.pWall)
+        discard Log.d("hellomello", "FlappyView.dodraw after drawRect 1")
         c.drawRect(w.x.float-d.wallW2.float, w.y.float+d.holeH.float, w.x.float+d.wallW2.float, height.float, d.pWall)
+        discard Log.d("hellomello", "FlappyView.dodraw after drawRect 2")
+      discard Log.d("hellomello", "FlappyView.dodraw after for end")
       c.drawCircle(width/2, d.y.float, d.birdR.float, d.pBird)
       discard Log.d("hellomello", "FlappyView.dodraw end")
 
