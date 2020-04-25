@@ -52,12 +52,30 @@ expandMacros: expandMacros:
 
     proc surfaceChanged*(holder: SurfaceHolder; format, width, height: jint) =
       discard Log.d("hellomello", "FlappyView.surfaceChanged")
+      discard Log.d("hellomello", "w h = " & $(this.getWidth, this.getHeight))
     proc surfaceCreated*(holder: SurfaceHolder) =
       # let d = this.data
       # if d.renderer != nil:
       #   d.renderer.join()
       # d.renderer = Thread.new(cast[Runnable](this))
       discard Log.d("hellomello", "FlappyView.surfaceCreated")
+      discard Log.d("hellomello", "w h = " & $(this.getWidth, this.getHeight))
+      let
+        w = this.getWidth()
+        h = this.getHeight()
+        d = this.data
+      d.walls = @[(int(w/2), this.data.y), (int(w), int(h/3*2))]
+      d.wallW2 = int(w/5/2)
+      d.y = int(h / 2)
+      d.holeH = int(h/6)
+      d.birdR = int(h/20)
+      d.live = true
+      ###
+      d.x = 30
+      d.pWall = Paint.new()
+      d.pWall.setColor(green)
+      d.pBird = Paint.new()
+      d.pBird.setColor(red)
     proc surfaceDestroyed*(holder: SurfaceHolder) =
       discard Log.d("hellomello", "FlappyView.surfaceDestroyed")
 
@@ -65,21 +83,12 @@ expandMacros: expandMacros:
       discard Log.d("hellomello", "FlappyView.start begin")
       this.setBackgroundColor(blue)
       this.setWillNotDraw(false)
-      let
-        w = this.getWidth()
-        h = this.getHeight()
-        d = this.data
-      d.x = 30
-      d.pWall = Paint.new()
-      d.pWall.setColor(green)
-      d.pBird = Paint.new()
-      d.pBird.setColor(red)
-      d.y = int(h / 2)
-      d.walls = @[(int(w/2), this.data.y), (int(w), int(h/3*2))]
-      d.live = true
-      d.wallW2 = int(w/5/2)
-      d.holeH = int(h/6)
-      d.birdR = int(h/20)
+      let d = this.data
+      # d.x = 30
+      # d.pWall = Paint.new()
+      # d.pWall.setColor(green)
+      # d.pBird = Paint.new()
+      # d.pBird.setColor(red)
 
       # TODO: can we avoid 'super' below? getWidth() doesn't complain, why?
       d.holder = this.super.getHolder()
@@ -102,12 +111,16 @@ expandMacros: expandMacros:
       discard Log.d("hellomello", "FlappyView.dodraw after this.getHeight")
       let width = this.getWidth()
       discard Log.d("hellomello", "FlappyView.dodraw after this.getWidth")
+      discard Log.d("hellomello", "width=" & $width)
       for w in d.walls:
         discard Log.d("hellomello", "FlappyView.dodraw after for start")
+        discard Log.d("hellomello", "this.getWidth=" & $this.getWidth)
         c.drawRect(w.x.float-d.wallW2.float, 0.float, w.x.float+d.wallW2.float, w.y.float-d.holeH.float, d.pWall)
         discard Log.d("hellomello", "FlappyView.dodraw after drawRect 1")
+        discard Log.d("hellomello", $(w.x.float-d.wallW2.float, 0.float, w.x.float+d.wallW2.float, w.y.float-d.holeH.float, d.pWall))
         c.drawRect(w.x.float-d.wallW2.float, w.y.float+d.holeH.float, w.x.float+d.wallW2.float, height.float, d.pWall)
         discard Log.d("hellomello", "FlappyView.dodraw after drawRect 2")
+        discard Log.d("hellomello", $(w.x.float-d.wallW2.float, w.y.float+d.holeH.float, w.x.float+d.wallW2.float, height.float, d.pWall))
       discard Log.d("hellomello", "FlappyView.dodraw after for end")
       c.drawCircle(width/2, d.y.float, d.birdR.float, d.pBird)
       discard Log.d("hellomello", "FlappyView.dodraw end")
