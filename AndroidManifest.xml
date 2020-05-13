@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="io.github.yglukhov.jnim">
+    package="com.akavel.hellomello1">
     <application android:label="HelloDaliJNI">
         <activity android:name="Jnim$NimActivity">
             <intent-filter>

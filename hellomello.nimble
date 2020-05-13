@@ -21,7 +21,7 @@ requires "android"
 
 task dex, "Assemble a classes.dex file":
   mkDir("apk")
-  exec("nim c --threads:on --tlsEmulation:off -d:jnimGenDex hello.nim")
+  exec("nim c --threads:on --tlsEmulation:off -d:jnimGenDex -d:JnimPackageName=com.akavel.hellomello1 hello.nim")
   exec("nim c -r jnim_gen_dex.nim apk/classes.dex libhello-mello.so")
 
 task so, "Compile and link an Android .so library":
@@ -30,7 +30,7 @@ task so, "Compile and link an Android .so library":
   # https://forum.nim-lang.org/t/3575
   # https://forum.nim-lang.org/t/2696#16699
   # TODO: --stackTraces:off ?
-  exec("nim c --app:lib --os:android --cpu=arm --threads:on --tlsEmulation:off -d:noSignalHandler --hint[CC]:on --listcmd -o:apk/lib/armeabi-v7a/libhello-mello.so hello.nim")
+  exec("nim c -d:JnimPackageName=com.akavel.hellomello1 --app:lib --os:android --cpu=arm --threads:on --tlsEmulation:off -d:noSignalHandler --hint[CC]:on --listcmd -o:apk/lib/armeabi-v7a/libhello-mello.so hello.nim")
 
 from os import getHomeDir
 
@@ -42,6 +42,7 @@ task manifest, "Compile AndroidManifest.xml to binary format":
   const hash = "efadb3f340327c36712115acb881cafa1774a47b"
   let marco = getHomeDir() & ".nimble/pkgs/marco-#" & hash & "/marco".toExe
   if not existsFile(marco):
+    echo "marco not found, trying to install from: github.com/akavel/marco"
     exec("nimble install https://github.com/akavel/marco@#" & hash)
   # TODO: when failed, print instructions how to install and build https://github.com/akavel/marco
   exec(marco & " -i=AndroidManifest.xml -o=apk/AndroidManifest.xml")
