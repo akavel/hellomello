@@ -12,7 +12,6 @@ import android/os/bundle
 import android/graphics/[paint, canvas]
 import android/view/[view, surface, surface_view, surface_holder, motion_event]
 import android/util/log
-# import android/util/concurrent/atomic/atomic_boolean
 
 jclass java.lang.Thread of JVMObject:
   proc new(r: Runnable)
@@ -55,117 +54,102 @@ type
     # TODO: can't we avoid this indirection level?
     data: FlappyViewData
 
-expandMacros: expandMacros:
-  jexport FlappyView extends SurfaceView implements Runnable, SurfaceHolderCallback:
-    proc new(c: Context) = super(c)  # TODO: or else?
+jexport FlappyView extends SurfaceView implements Runnable, SurfaceHolderCallback:
+  proc new(c: Context) = super(c)  # TODO: or else?
 
-    proc surfaceChanged*(holder: SurfaceHolder; format, width, height: jint) =
-      discard Log.d("hellomello", "FlappyView.surfaceChanged")
-      discard
-    proc surfaceCreated*(holder: SurfaceHolder) =
-      discard Log.d("hellomello", "FlappyView.surfaceCreated")
-      let
-        w = this.getWidth()
-        h = this.getHeight()
-        d = this.data
-      d.y = int(h / 2)
-      d.walls = @[(int(w/2), d.y), (int(w), int(h/3*2))]
-      d.wallW2 = int(w/5/2)
-      d.holeH = int(h/6)
-      d.birdR = int(h/20)
+  proc surfaceChanged*(holder: SurfaceHolder; format, width, height: jint) =
+    discard
+  proc surfaceCreated*(holder: SurfaceHolder) =
+    let
+      w = this.getWidth()
+      h = this.getHeight()
+      d = this.data
+    d.y = int(h / 2)
+    d.walls = @[(int(w/2), d.y), (int(w), int(h/3*2))]
+    d.wallW2 = int(w/5/2)
+    d.holeH = int(h/6)
+    d.birdR = int(h/20)
+    d.live = true
+    ###
+    d.x = 30
+    d.pSky = Paint.new()
+    d.pSky.setColor(blue)
+    d.pWall = Paint.new()
+    d.pWall.setColor(green)
+    d.pBird = Paint.new()
+    d.pBird.setColor(red)
+  proc surfaceDestroyed*(holder: SurfaceHolder) =
+    discard
+
+  proc onTouchEvent*(evt: MotionEvent): jboolean =
+    this.data.lock.withLock:
+      this.data.touched = true
+    # FIXME: can we avoid cast below?
+    return this.super.onTouchEvent(evt).jboolean
+
+  proc start() =
+    let d = this.data
+    d.lock.initLock
+    d.rng = initRand(123)
+    # TODO: can we avoid 'super' below? getWidth() doesn't complain, why?
+    d.holder = this.super.getHolder()
+    # TODO: can we avoid cast below?
+    d.renderer = Thread.new(cast[Runnable](this))
+    d.renderer.start()
+
+  proc stop() =
+    this.data.renderer.interrupt()
+    this.data.renderer.join()
+
+  proc logic(c: Canvas) =
+    let
+      d = this.data
+      height = this.getHeight()
+      width = this.getWidth()
+
+    if not d.live:
       d.live = true
-      ###
-      d.x = 30
-      d.pSky = Paint.new()
-      d.pSky.setColor(blue)
-      d.pWall = Paint.new()
-      d.pWall.setColor(green)
-      d.pBird = Paint.new()
-      d.pBird.setColor(red)
-    proc surfaceDestroyed*(holder: SurfaceHolder) =
-      discard Log.d("hellomello", "FlappyView.surfaceDestroyed")
-      discard
+      d.y = int(height/2)
+      d.vy = -17
 
-    proc onTouchEvent*(evt: MotionEvent): jboolean =
-      discard Log.d("hellomello", "ON TOUCH EVENT")
-      this.data.lock.withLock:
-        this.data.touched = true
-      # return false
-      # FIXME: can we avoid cast below?
-      return this.super.onTouchEvent(evt).jboolean
-
-    proc start() =
-      discard Log.d("hellomello", "FlappyView.start begin")
-      let d = this.data
-      d.lock.initLock
-      d.rng = initRand(123)
-      # d.touched = AtomicBoolean.new()
-      # TODO: can we avoid 'super' below? getWidth() doesn't complain, why?
-      d.holder = this.super.getHolder()
-      # TODO: can we avoid cast below?
-      d.renderer = Thread.new(cast[Runnable](this))
-      d.renderer.start()
-      discard Log.d("hellomello", "FlappyView.start end")
-
-    proc stop() =
-      discard Log.d("hellomello", "FlappyView.stop begin")
-      this.data.renderer.interrupt()
-      this.data.renderer.join()
-      discard Log.d("hellomello", "FlappyView.stop end")
-
-    proc logic(c: Canvas) =
-      # discard Log.d("hellomello", "FlappyView.logic begin")
-      let
-        d = this.data
-        height = this.getHeight()
-        width = this.getWidth()
-
-      if not d.live:
-        d.live = true
-        d.y = int(height/2)
+    d.lock.withLock:
+      if d.touched:
+        d.touched = false
         d.vy = -17
+    d.vy.inc
+    d.y += d.vy
 
-      d.lock.withLock:
-        if d.touched:
-          d.touched = false
-          d.vy = -17
-      d.vy.inc
-      d.y += d.vy
+    # TEMPORARY:
+    if d.y > height or d.y < 0:
+      d.live = false
 
-      # TEMPORARY:
-      if d.y > height or d.y < 0:
-        d.live = false
+    c.drawPaint(d.pSky)
+    for w in d.walls.mitems:
+      c.drawRect(w.x.float-d.wallW2.float, 0.float, w.x.float+d.wallW2.float, w.y.float-d.holeH.float, d.pWall)
+      c.drawRect(w.x.float-d.wallW2.float, w.y.float+d.holeH.float, w.x.float+d.wallW2.float, height.float, d.pWall)
+      if w.x < 0:
+        w.x = width.int
+        w.y = d.rng.rand(200 .. height.int-200)
+      w.x -= 3
+    c.drawCircle(width/2, d.y.float, d.birdR.float, d.pBird)
+    # if not d.isnil and not d.touched.isnil and d.touched.get:
+    #   d.touched.set(false)
+    #   d.y.dec
 
-      c.drawPaint(d.pSky)
-      for w in d.walls.mitems:
-        c.drawRect(w.x.float-d.wallW2.float, 0.float, w.x.float+d.wallW2.float, w.y.float-d.holeH.float, d.pWall)
-        c.drawRect(w.x.float-d.wallW2.float, w.y.float+d.holeH.float, w.x.float+d.wallW2.float, height.float, d.pWall)
-        if w.x < 0:
-          w.x = width.int
-          w.y = d.rng.rand(200 .. height.int-200)
-        w.x -= 3
-      c.drawCircle(width/2, d.y.float, d.birdR.float, d.pBird)
-      # if not d.isnil and not d.touched.isnil and d.touched.get:
-      #   d.touched.set(false)
-      #   d.y.dec
-      # discard Log.d("hellomello", "FlappyView.logic end")
-
-    proc run() =
-      discard Log.d("hellomello", "FlappyView.run begin")
-      let d = this.data
-      while true:
-        if Thread.interrupted().bool:
-          break
-        if not d.holder.getSurface().isValid().bool:
-          Thread.sleep(1000)
-          continue
-        let c = d.holder.lockCanvas()
-        if isnil c: # NOTE: SIGSEGV when `if c == nil:`
-          continue
-        this.logic(c)
-        d.holder.unlockCanvasAndPost(c)
-        Thread.sleep(16)  # VERY roughly ~60fps
-      discard Log.d("hellomello", "FlappyView.run end")
+  proc run() =
+    let d = this.data
+    while true:
+      if Thread.interrupted().bool:
+        break
+      if not d.holder.getSurface().isValid().bool:
+        Thread.sleep(1000)
+        continue
+      let c = d.holder.lockCanvas()
+      if isnil c: # NOTE: SIGSEGV when `if c == nil:`
+        continue
+      this.logic(c)
+      d.holder.unlockCanvasAndPost(c)
+      Thread.sleep(16)  # VERY roughly ~60fps
 
 
 type
@@ -178,26 +162,19 @@ jexport NimActivity extends Activity:
   proc new() = super()  # TODO: or else?
 
   proc onCreate(b: Bundle) =
-    discard Log.d("hellomello", "NimActivity.onCreate begin")
     this.super.onCreate(b)
     let v = FlappyView.new(this)
     this.data.v = v
     v.super.getHolder().addCallback(v)
-    # this.super.setContentView(this.data.v)
     this.super.setContentView(v)
-    discard Log.d("hellomello", "NimActivity.onCreate end")
 
   proc onResume() =
-    discard Log.d("hellomello", "NimActivity.onResume begin")
     this.super.onResume()
     this.data.v.start()
-    discard Log.d("hellomello", "NimActivity.onResume end")
 
   proc onPause() =
-    discard Log.d("hellomello", "NimActivity.onPause begin")
     this.super.onPause()
     this.data.v.stop()
-    discard Log.d("hellomello", "NimActivity.onPause end")
 
 when defined(jnimGenDex):
   jnimDexWrite("jnim_gen_dex.nim")
